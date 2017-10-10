@@ -77,16 +77,7 @@ write_result(){
 	if [ ${MAKE_ARCHIVE} ]; then
 		tar -czf output.tgz ${COMPUTED_FILES[@]}
 	fi
-
-	echo "Do you want to quit? Y/N"
-	read -r ANSWER
-	if [ ${ANSWER} == "Y" -o ${ANSWER} == "y" ]; then
-
-		exit 0
-	else
-		main_loop
-	fi
-
+	exit 0
 }
 
 while getopts ":hvzn" opt; do
