@@ -5,13 +5,18 @@ FILE_COUNT=0
 LINK_COUNT=0
 COMPUTED_FILES=()
 
+WRITE_SUMMARY=false
+MAKE_ARCHIVE=false
+ERROR_FILE=false
+
+COUNTING=false
 
 main_loop(){
 	while read -r LINE
 	do
 		if [[ ${LINE} == "FILE "* ]]; then
-
-			FILE_PATH=$(realpath ${LINE:5:${#LINE}})
+			RELATIVE_PATH="${LINE:5:${#LINE}}"
+			FILE_PATH=$(realpath -s "${RELATIVE_PATH}")
 			process_data
 
 		fi
@@ -22,38 +27,37 @@ main_loop(){
 }
 
 process_data(){
-	if [ -d ${FILE_PATH} ]; then #directory
+	if [[ -d "${FILE_PATH}" ]]; then #directory
 		((DIR_COUNT++))
 
-		if [ ${COUNTING} ]; then
+		if [ "${COUNTING}" = true ]; then
 			echo "DIR ${DIR_COUNT} '${FILE_PATH}'"
 		else
 			echo "DIR '${FILE_PATH}'"
 		fi
-	elif [ -L ${FILE_PATH} ]; then #sym link
+	elif [[ -L "${FILE_PATH}" ]]; then #sym link
 		((LINK_COUNT++))
-
-		LINK_DESTINATION=$(readlink -f ${FILE_PATH})
-
-		if [ ${COUNTING} ]; then
+		LINK_DESTINATION=$(readlink ${FILE_PATH})
+		if [ "${COUNTING}" = true ]; then
 			echo "LINK ${LINK_COUNT} '${FILE_PATH}' '${LINK_DESTINATION}'"
 		else
 			echo "LINK '${FILE_PATH}' '${LINK_DESTINATION}'"
 		fi
-	elif [ -f ${FILE_PATH} ]; then #file
+	elif [[ -f "${FILE_PATH}" ]]; then #file
 		COMPUTED_FILES+=("${FILE_PATH}")
 		((FILE_COUNT++))
 
-		LINE_COUNT=$(wc -l < ${FILE_PATH})
-		FIRST_LINE=$(head -n 1 ${FILE_PATH})
+		LINE_COUNT=$(wc -l < "${FILE_PATH}")
+		FIRST_LINE=$(head -n 1 "${FILE_PATH}")
 
-		if [ ${COUNTING} ]; then
+		if [ "${COUNTING}" = true ]; then
 			echo "FILE ${FILE_COUNT} '${FILE_PATH}' ${LINE_COUNT} '${FIRST_LINE}'"
 		else
 			echo "FILE '${FILE_PATH}' ${LINE_COUNT} '${FIRST_LINE}'"
 		fi
 	else
-		echo "ERROR '${FILE_PATH}'"
+		>&2 echo "ERROR '${RELATIVE_PATH}'"
+		ERROR_FILE=true
 	fi
 }
 
@@ -68,16 +72,21 @@ write_manual(){
 }
 
 write_result(){
-	if [ ${WRITE_SUMMARY} ]; then
+	if [ "${WRITE_SUMMARY}" = true ]; then
 		echo ${FILE_COUNT}
 		echo ${DIR_COUNT}
 		echo ${LINK_COUNT}
 	fi
 
-	if [ ${MAKE_ARCHIVE} ]; then
-		tar -czf output.tgz ${COMPUTED_FILES[@]}
+	if [ "${MAKE_ARCHIVE}" = true ]; then
+		tar -czf output.tgz "${COMPUTED_FILES[@]}"
 	fi
-	exit 0
+	
+	if [ "${ERROR_FILE}" = true ]; then
+		exit 1
+	else
+		exit 0
+	fi
 }
 
 while getopts ":hvzn" opt; do
@@ -90,7 +99,7 @@ while getopts ":hvzn" opt; do
 			;;
 		n) COUNTING=true
 			;;
-		?) echo "Wrong argument."
+		?)
 			exit 2
 			;;
 	esac
