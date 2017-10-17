@@ -7,11 +7,17 @@ arg_num=0
 read_from_stdin=false
 
 parse_pdf(){
-    echo "${web_page}" | tr -d '\n' | grep -io "<a[[:space:]]*href=\"[^\"]\+\.pdf\">" | awk 'BEGIN{FS="\""}{print $2}'
+#    echo "${web_page}" | tr -d '\n' | grep -io '<a [^>]*href[[:space:]]*=[[:space:]]*"[^"]*\.pdf"' |
+#    grep -io 'href[[:space:]]*=[[:space:]]*"[^"]*\.pdf"'  | awk 'BEGIN{FS="\""}{print $2}'
+    echo "${web_page}" | grep -io "<[[:space:]]*a [^>]*href[[:space:]]*=[[:space:]]*\"[^\"]\+\.pdf\"" \
+    | grep -io "href[[:space:]]*=[[:space:]]*\"[^\"]\+\.pdf\""  | awk 'BEGIN{FS="\""}{print $2}'
 }
 
 get_page(){
-    web_page="`wget -qO- "${url}"`"
+    web_page=`curl -Ls "${url}"`
+    if [[ "$?" -ne "0" ]]; then
+        exit 3
+    fi
 }
 
 verify_arg(){
@@ -22,7 +28,6 @@ verify_arg(){
 }
 
 print_man(){
-    echo "Usage of the script:"
     echo "`basename $0` [-h] [-i] [-u <argument>]"
     echo "-h show this man page"
     echo "-i script takes url from standard input"
@@ -46,6 +51,7 @@ while getopts ":hiu:" opt; do
   u) arg_num=$((arg_num+1))
      verify_arg
      url="${OPTARG}"
+    >&2 echo "${url}"
     ;;
   ?) >&2 echo "Script has invalid argument to run!"
     exit 1
@@ -56,8 +62,9 @@ shift $(($OPTIND - 1))
 # url="https://cw.fel.cvut.cz/wiki/_media/courses/b4b35osy/cviceni/cviceni03_test_html.txt"
 
 if [[ ${read_from_stdin} = true ]]; then
-    read -r url
+    web_page=$(cat)
+else
+    get_page
 fi
-
-get_page
+>&2 echo "${web_page}"
 parse_pdf
