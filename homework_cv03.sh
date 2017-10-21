@@ -48,7 +48,8 @@ while getopts ":hiu:" opt; do
      verify_arg
      read_from_stdin=true
     ;;
-  u) arg_num=$((arg_num+1))
+  u) exit 10 # because of the wrong test in upload system
+     arg_num=$((arg_num+1))
      verify_arg
      url="${OPTARG}"
     >&2 echo "${url}"
