@@ -15,7 +15,7 @@ void nsd(int *pipe);
 
 
 int main(int argc, char *argv[]) {
-    pid_t pid, GEN, NSD;
+    pid_t pid, GEN;
     int fd[2];
 
     if (pipe(fd)) {
@@ -42,7 +42,9 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "ERROR");
             return 2;
         } else { //parent
-            NSD = pid;
+            close(fd[0]);
+            close(fd[1]);
+
             sleep(5);
 
             kill(GEN, SIGTERM);
@@ -77,14 +79,11 @@ void gen(int *pipe) {
     action.sa_flags = SA_SIGINFO | SA_RESTART;
     sigaction(SIGTERM, &action, NULL);
 
-    FILE *stream = fdopen(pipe[WRITE_END], "w");
-
     while (!done) {
-        fprintf(stream, "%d %d\n", rand(), rand());
+        printf("%d %d\n", rand(), rand());
         sleep(1);
     }
 
-    fclose(stream);
     close(pipe[WRITE_END]);
     fprintf(stderr, "GEN TERMINATED\n");
 }
