@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     int fd[2];
 
     if (pipe(fd)) {
-        fprintf(stderr, "ERROR");
+        fprintf(stdout, "ERROR");
         return 2;
     }
 
@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
         gen(fd);
 
     } else if (pid < (pid_t) 0) {
-        fprintf(stderr, "ERROR");
+        fprintf(stdout, "ERROR");
         return 2;
 
     } else {
@@ -38,19 +38,29 @@ int main(int argc, char *argv[]) {
 
         if (pid == (pid_t) 0) { //NSD
             nsd(fd);
+
         } else if (GEN < (pid_t) 0) {
-            fprintf(stderr, "ERROR");
+            fprintf(stdout, "ERROR");
             return 2;
         } else { //parent
-            close(fd[0]);
-            close(fd[1]);
+            close(fd[READ_END]);
+            close(fd[WRITE_END]);
 
             sleep(5);
 
             kill(GEN, SIGTERM);
 
-            int status;
-            waitpid(GEN, &status, WUNTRACED);
+            int GEN_STATUS;
+            waitpid(GEN, &GEN_STATUS, 0);
+            int NDS_status;
+            waitpid(pid, &NDS_status, 0);
+            if(GEN_STATUS == 0 && NDS_status == 0){
+                fprintf(stdout, "OK");
+                return 0;
+            } else{
+                fprintf(stdout, "ERROR");
+                return 1;
+            }
         }
     }
 
@@ -58,7 +68,12 @@ int main(int argc, char *argv[]) {
 }
 
 void nsd(int *pipe) {
-    dup2(pipe[READ_END], STDIN_FILENO);
+    if(dup2(pipe[READ_END], STDIN_FILENO) == -1){
+
+        exit(2);
+    }
+    close(pipe[READ_END]);
+    close(pipe[WRITE_END]);
 
     execl("./nsd", "./nsd", (char *) NULL);
 }
@@ -70,7 +85,11 @@ void term(int signum) {
 }
 
 void gen(int *pipe) {
-    dup2(pipe[WRITE_END], STDOUT_FILENO);
+    if(dup2(pipe[WRITE_END], STDOUT_FILENO) == -1){
+        exit(2);
+    }
+    close(pipe[WRITE_END]);
+    close(pipe[READ_END]);
 
     struct sigaction action;
     memset(&action, 0, sizeof(action));
@@ -81,9 +100,9 @@ void gen(int *pipe) {
 
     while (!done) {
         printf("%d %d\n", rand(), rand());
+        fflush(stdout);
         sleep(1);
     }
 
-    close(pipe[WRITE_END]);
     fprintf(stderr, "GEN TERMINATED\n");
 }
