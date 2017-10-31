@@ -12,6 +12,7 @@
 pthread_mutex_t mutex;
 sem_t added;
 
+int number_of_consumers = DEFAULT_CONSUMERS;
 
 typedef struct node {
     char * word;
@@ -79,13 +80,16 @@ void *producer(void *arg) {
 
         if(scan_result == EOF){
             free(word);
+            word = NULL;
             break;
         }
     }
-
     consumer_is_runing = false;
     producer_is_running = false;
-    sem_post(&added); // invoke waiting threads
+
+    for(int i = 0; i <number_of_consumers; i++){
+        sem_post(&added);
+    }
     return NULL;
 }
 
@@ -148,12 +152,13 @@ int parse_int(char *argv) {
 
 
 int main_program(int consumers_no){
-    sem_init(&added,1,0);
+    number_of_consumers = consumers_no;
 
     pthread_t tid_producer;
     pthread_t * tid_consumers = (pthread_t*)malloc(sizeof(pthread_t) * consumers_no);
 
     pthread_create(&tid_producer,NULL,producer,NULL);
+    sem_init(&added,1,0);
 
     for (int i = 0; i < consumers_no; i++) {
         int cons_id = i + 1;
