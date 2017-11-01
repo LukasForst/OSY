@@ -9,8 +9,8 @@
 
 #define DEFAULT_CONSUMERS 1
 
-pthread_mutex_t mutex;
-sem_t added;
+pthread_mutex_t print_mutex, buffer_mutex;
+sem_t wake_consumer, wake_producer;
 
 int number_of_consumers = DEFAULT_CONSUMERS;
 
@@ -66,13 +66,11 @@ void *producer(void *arg) {
         scan_result = scanf("%u %s", &id, word);
 
         while(scan_result == 2){
-            pthread_mutex_lock(&mutex);
-
+            pthread_mutex_lock(&buffer_mutex);
             write_to_buffer(word, id);
+            pthread_mutex_unlock(&buffer_mutex);
 
-            pthread_mutex_unlock(&mutex);
-
-            sem_post(&added);
+            sem_post(&wake_consumer);
 
             word = (char*) malloc(256*sizeof(char));
             scan_result = scanf("%u %s", &id, word);
@@ -84,25 +82,36 @@ void *producer(void *arg) {
             break;
         }
     }
+
+    while(head != NULL){
+        sem_wait(&wake_producer);
+    }
+
     consumer_is_runing = false;
     producer_is_running = false;
 
     for(int i = 0; i <number_of_consumers; i++){
-        sem_post(&added);
+        sem_post(&wake_consumer);
     }
     return NULL;
 }
 
 void consume(int consumer_id){
+    pthread_mutex_lock(&buffer_mutex);
     node_s * node = read_from_buffer();
+    pthread_mutex_unlock(&buffer_mutex);
 
     if(node != NULL){
+        pthread_mutex_lock(&print_mutex);
         printf("Thread %d:", consumer_id);
         for(int i = 0; i < node->id; i++){
             printf(" %s", node->word);
         }
         printf("\n");
+        pthread_mutex_unlock(&print_mutex);
 
+
+        pthread_mutex_lock(&buffer_mutex);
         if(node->word != NULL){
             free(node->word);
             node->word = NULL;
@@ -110,6 +119,7 @@ void consume(int consumer_id){
 
         free(node);
         node = NULL;
+        pthread_mutex_unlock(&buffer_mutex);
     }
 
 }
@@ -117,10 +127,11 @@ void consume(int consumer_id){
 void *consumer(void *arg) {
     int * consumer_id = (int*) arg;
     while(consumer_is_runing){
-        sem_wait(&added);
-        pthread_mutex_lock(&mutex);
-        consume(*consumer_id);
-        pthread_mutex_unlock(&mutex);
+        while (head != NULL){
+            consume(*consumer_id);
+        }
+        sem_post(&wake_producer);
+        sem_wait(&wake_consumer);
     }
     return NULL;
 }
@@ -158,7 +169,7 @@ int main_program(int consumers_no){
     pthread_t * tid_consumers = (pthread_t*)malloc(sizeof(pthread_t) * consumers_no);
 
     pthread_create(&tid_producer,NULL,producer,NULL);
-    sem_init(&added,1,0);
+
 
     for (int i = 0; i < consumers_no; i++) {
         int cons_id = i + 1;
@@ -186,7 +197,11 @@ int main_program(int consumers_no){
 }
 
 int main(int argc, char **argv) {
-    pthread_mutex_init(&mutex,NULL);
+    pthread_mutex_init(&print_mutex,NULL);
+    pthread_mutex_init(&buffer_mutex,NULL);
+
+    sem_init(&wake_consumer,1,0);
+    sem_init(&wake_producer,1,1);
 
     int consumers_no = argc == 1 ? DEFAULT_CONSUMERS : parse_int(argv[1]);
     verify_argc(consumers_no);
