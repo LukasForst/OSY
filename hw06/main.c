@@ -15,7 +15,6 @@ typedef struct{
 
 void * worker(void * arg){
     worker_data * data = (worker_data*) arg;
-    NULL
 }
 
 int main() {
