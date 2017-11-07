@@ -5,9 +5,21 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <memory.h>
+#include <semaphore.h>
 #include "workplace_provider.h"
 
 workplace_t *head;
+
+void wake_up_workplaces(workplace_type type){
+    workplace_t *cursor = head;
+
+    while (cursor != NULL) {
+        if (cursor->type == type) {
+            sem_post(&cursor->added);
+        }
+        cursor = cursor->next_workplace;
+    }
+}
 
 char *get_workplace_name(workplace_type type){
     switch (type){
@@ -111,7 +123,8 @@ void delete_workplace(workplace_type type) {
 
             previous->next_workplace = cursor->next_workplace;
             cursor->next_workplace = NULL;
-
+            sem_close(&cursor->added);
+            sem_destroy(&cursor->added);
             pthread_mutex_unlock(&cursor->mutex);
             pthread_mutex_destroy(&cursor->mutex);
             free(cursor);
@@ -128,6 +141,7 @@ void add_workplace(workplace_type type) {
     new_workplace->is_working = false;
     new_workplace->is_active = true;
     new_workplace->next_workplace = NULL;
+    sem_init(&(new_workplace->added), 1, 0);
 
     pthread_mutex_init(&(new_workplace->mutex), NULL);
 

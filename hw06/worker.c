@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <semaphore.h>
 
 #include "worker.h"
 #include "global.h"
@@ -16,11 +17,12 @@
 void *worker(void *arg) {
     worker_info_t *worker_info = (worker_info_t *) arg;
     workplace_t *workplace = worker_info->workplace;
+
     while (true) {
         job_t *job = get_job(workplace->type);
 
         if (job == NULL) {
-            //todo implement waiting for job
+            sem_wait(&workplace->added);
             continue;
         }
 

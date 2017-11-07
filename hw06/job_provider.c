@@ -5,6 +5,7 @@
 #include "job_provider.h"
 #include "buffers.h"
 #include "workplace_chain.h"
+#include "workplace_provider.h"
 
 char get_job_type_name(job_type type) {
     switch (type) {
@@ -78,6 +79,7 @@ void add_job(job_t *job_to_add) {
         default:
             break;
     }
+    wake_up_workplaces(job_to_add->current_workplace);
 }
 
 job_t *get_job(workplace_type name) {

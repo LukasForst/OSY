@@ -6,6 +6,7 @@
 #define HW06_GLOBAL_H
 
 #include <pthread.h>
+#include <bits/semaphore.h>
 
 typedef enum {
     NOT_STARTED, SCISSORS, DRILL, BENDING_MACHINE, WELDER, PAINTER, SCREWDRIVER, MILLING_CUTTER, FINISHED
@@ -22,6 +23,7 @@ typedef struct workplace {
 
     workplace_type type;
     pthread_mutex_t mutex;
+    sem_t added; //signal, that job has been added
 
     struct workplace *next_workplace; // for linked list
 } workplace_t;
