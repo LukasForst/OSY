@@ -1,5 +1,5 @@
 #EXTRA_CFLAGS ?=-fsanitize=address -fno-omit-frame-pointer
-FILES=main.o buffers.o job_handler.o workplace_chain.o commands.o factory.o
+FILES=main.o buffers.o job_provider.o workplace_chain.o commands.o workplace_provider.o
 CC=gcc
 CFLAGS=-g -Wall -Iinclude
 

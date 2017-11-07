@@ -34,16 +34,19 @@ int main() {
             } else if (strcmp(word, "remove") == 0) {
                 command_remove();
             }
-
+            free(word);
+            word = NULL;
             scan_result = scanf("%ms", &word);
         }
 
         if (scan_result != EOF) {
             if (word != NULL) {
-//                free(word);
+                free(word);
+                word = NULL;
             }
             continue;
         }
+        break;
 
         //todo free data and wait for consumers
     }

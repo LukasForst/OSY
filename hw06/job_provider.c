@@ -1,8 +1,40 @@
 //
 // Created by lukas on 11/7/17.
 //
-#include "job_handler.h"
+#include <stdlib.h>
+#include "job_provider.h"
 #include "buffers.h"
+#include "workplace_chain.h"
+
+job_type get_job_type(char type) {
+    switch (type) {
+        case 'A':
+            return A;
+        case 'B':
+            return B;
+        case 'C':
+            return C;
+        default:
+            break;
+    }
+    //todo better error handling
+    return (job_type) -1; //not defined
+}
+
+job_t *create_job(char char_type) {
+    job_t *job = (job_t *) malloc(sizeof(job_t));
+    job->type = get_job_type(char_type);;
+    job->current_workplace = NOT_STARTED;
+    job->step = 0;
+
+    workplace_type place = get_next_work_place(job);
+    int sleep_time = get_sleep_time(place);
+
+    job->sleep_time = sleep_time;
+    job->current_workplace = place;
+
+    return job;
+}
 
 void add_job(job_t *job_to_add) {
     //todo notify all workers
@@ -23,7 +55,7 @@ void add_job(job_t *job_to_add) {
             add_painter_job(job_to_add);
             break;
         case SCREWDRIVER:
-            add_srewdriver_job(job_to_add);
+            add_screwdriver_job(job_to_add);
             break;
         case MILLING_CUTTER:
             add_milling_job(job_to_add);

@@ -40,8 +40,9 @@ workplace_type get_next_work_place(job_t *job) {
             return get_next(job->current_workplace, B_chain, sizeof(B_chain));
         case C:
             return get_next(job->current_workplace, C_chain, sizeof(C_chain));
+        default:
+            return FINISHED;
     }
-    return FINISHED;
 }
 
 

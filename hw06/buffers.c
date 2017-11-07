@@ -30,14 +30,15 @@ pthread_mutex_t milling_cutter_mutex;
 
 
 job_t *get_tail(job_t *head) {
-    while (head != NULL) {
-        if (head->next_job != NULL) {
-            head = head->next_job;
-        } else {
-            return head;
+    job_t * cursor = head;
+    while(cursor != NULL){
+        if(cursor->next_job != NULL){
+            cursor = cursor->next_job;
+        } else{
+            break;
         }
     }
-    return head;
+    return cursor;
 }
 
 void free_one_buffer(job_t *head) {
@@ -227,7 +228,7 @@ job_t *get_screwdriver_job() {
     return result;
 }
 
-void add_srewdriver_job(job_t *work_to_add) {
+void add_screwdriver_job(job_t *work_to_add) {
     pthread_mutex_lock(&screwdriver_mutex);
 
     job_t *tail = get_tail(screwdriver_head);

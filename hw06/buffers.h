@@ -25,7 +25,7 @@ job_t * get_painter_job();
 void add_painter_job(job_t* work_to_add);
 
 job_t * get_screwdriver_job();
-void add_srewdriver_job(job_t* work_to_add);
+void add_screwdriver_job(job_t *work_to_add);
 
 job_t * get_milling_job();
 void add_milling_job(job_t* work_to_add);
