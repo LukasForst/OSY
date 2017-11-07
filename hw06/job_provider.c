@@ -25,6 +25,7 @@ job_t *create_job(char char_type) {
     job_t *job = (job_t *) malloc(sizeof(job_t));
     job->type = get_job_type(char_type);;
     job->current_workplace = NOT_STARTED;
+    job->next_job = NULL;
     job->step = 0;
 
     workplace_type place = get_next_work_place(job);

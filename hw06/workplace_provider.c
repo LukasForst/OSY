@@ -101,40 +101,27 @@ void delete_workplace(workplace_type type) {
     }
 }
 
-void remove_workplace(char *type) {
-    workplace_type final_type = parse_workplace_type(type);
-    if ((int) final_type != -1) {
-        delete_workplace(final_type);
-    }
-}
-
 void add_workplace(workplace_type type) {
     workplace_t *new_workplace = (workplace_t *) malloc(sizeof(workplace_t));
     new_workplace->type = type;
     new_workplace->is_working = false;
     new_workplace->is_active = true;
+    new_workplace->next_workplace = NULL;
+
     pthread_mutex_init(&(new_workplace->mutex), NULL);
 
     if (head == NULL) {
         head = new_workplace;
     } else {
         workplace_t *tail = head;
-        while (true) {
+        while (tail != NULL) {
             if (tail->next_workplace != NULL) {
                 tail = tail->next_workplace;
             } else {
+                tail->next_workplace = new_workplace;
                 break;
             }
         }
-        tail->next_workplace = new_workplace;
-    }
-}
-
-
-void create_workplace(char *type) {
-    workplace_type final_type = parse_workplace_type(type);
-    if ((int) final_type != -1) {
-        add_workplace(final_type);
     }
 }
 

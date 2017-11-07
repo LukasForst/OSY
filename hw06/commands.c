@@ -24,6 +24,8 @@ _Bool command_make() {
 
 
 _Bool command_start() {
+
+
     return true;
 }
 
@@ -38,7 +40,8 @@ _Bool command_add() {
         //todo error handling
         return false;
     }
-    create_workplace(workplace_name);
+    workplace_type type = parse_workplace_type(workplace_name);
+    add_workplace(type);
     free(workplace_name);
     return true;
 }
@@ -49,7 +52,8 @@ _Bool command_remove() {
         //todo error handling
         return false;
     }
-    remove_workplace(workplace_name);
+    workplace_type type = parse_workplace_type(workplace_name);
+    delete_workplace(type);
     free(workplace_name);
     return true;
 }

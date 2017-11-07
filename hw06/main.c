@@ -5,22 +5,14 @@
 
 #include "buffers.h"
 #include "commands.h"
-
-void *worker(void *arg) {
-    worker_t *data = (worker_t *) arg;
-
-    return NULL;
-}
-
-_Bool should_read = true;
-
+#include "workplace_provider.h"
 int main() {
     buffers_init();
 
     int scan_result;
     char *word;
     scan_result = scanf("%ms", &word);
-    while (should_read) {
+    while (true) {
         while (scan_result == 1) {
 
             if (strcmp(word, "make") == 0) {
@@ -39,17 +31,19 @@ int main() {
             scan_result = scanf("%ms", &word);
         }
 
+        if (word != NULL) {
+            free(word);
+            word = NULL;
+        }
+
         if (scan_result != EOF) {
-            if (word != NULL) {
-                free(word);
-                word = NULL;
-            }
             continue;
         }
         break;
-
-        //todo free data and wait for consumers
     }
 
+    //todo free data and wait for consumers
+    free_buffers();
+    free_workplaces();
     return 0;
 }
