@@ -31,8 +31,8 @@ pthread_mutex_t milling_cutter_mutex;
 
 job_t *get_tail(job_t *head) {
     while (head != NULL) {
-        if (head->next_work != NULL) {
-            head = head->next_work;
+        if (head->next_job != NULL) {
+            head = head->next_job;
         } else {
             return head;
         }
@@ -43,7 +43,7 @@ job_t *get_tail(job_t *head) {
 void free_one_buffer(job_t *head) {
     while (head != NULL) {
         job_t *to_free = head;
-        head = head->next_work;
+        head = head->next_job;
         free(to_free);
     }
 }
@@ -84,7 +84,7 @@ job_t *get_scissors_job() {
     pthread_mutex_lock(&scissors_mutex);
 
     job_t *result = scissors_head;
-    scissors_head = scissors_head->next_work;
+    scissors_head = scissors_head->next_job;
 
     pthread_mutex_unlock(&scissors_mutex);
     return result;
@@ -97,7 +97,7 @@ void add_scissors_job(job_t *work_to_add) {
     if (tail == NULL) {
         scissors_head = work_to_add;
     } else {
-        tail->next_work = work_to_add;
+        tail->next_job = work_to_add;
     }
 
     pthread_mutex_unlock(&scissors_mutex);
@@ -111,7 +111,7 @@ job_t *get_drill_job() {
     pthread_mutex_lock(&drill_mutex);
 
     job_t *result = drill_head;
-    drill_head = drill_head->next_work;
+    drill_head = drill_head->next_job;
 
     pthread_mutex_unlock(&drill_mutex);
     return result;
@@ -124,7 +124,7 @@ void add_drill_job(job_t *work_to_add) {
     if (tail == NULL) {
         drill_head = work_to_add;
     } else {
-        tail->next_work = work_to_add;
+        tail->next_job = work_to_add;
     }
 
     pthread_mutex_unlock(&drill_mutex);
@@ -138,7 +138,7 @@ job_t *get_bending_machine_job() {
     pthread_mutex_lock(&bending_machine_mutex);
 
     job_t *result = bending_machine_head;
-    bending_machine_head = bending_machine_head->next_work;
+    bending_machine_head = bending_machine_head->next_job;
 
     pthread_mutex_unlock(&bending_machine_mutex);
     return result;
@@ -151,7 +151,7 @@ void add_bending_machine_job(job_t *work_to_add) {
     if (tail == NULL) {
         bending_machine_head = work_to_add;
     } else {
-        tail->next_work = work_to_add;
+        tail->next_job = work_to_add;
     }
 
     pthread_mutex_unlock(&bending_machine_mutex);
@@ -166,7 +166,7 @@ job_t *get_welder_job() {
     pthread_mutex_lock(&welder_mutex);
 
     job_t *result = welder_head;
-    welder_head = welder_head->next_work;
+    welder_head = welder_head->next_job;
 
     pthread_mutex_unlock(&welder_mutex);
     return result;
@@ -179,7 +179,7 @@ void add_welder_job(job_t *work_to_add) {
     if (tail == NULL) {
         welder_head = work_to_add;
     } else {
-        tail->next_work = work_to_add;
+        tail->next_job = work_to_add;
     }
     pthread_mutex_unlock(&welder_mutex);
 
@@ -193,7 +193,7 @@ job_t *get_painter_job() {
     pthread_mutex_lock(&painter_mutex);
 
     job_t *result = painter_head;
-    painter_head = painter_head->next_work;
+    painter_head = painter_head->next_job;
 
     pthread_mutex_unlock(&painter_mutex);
     return result;
@@ -206,7 +206,7 @@ void add_painter_job(job_t *work_to_add) {
     if (tail == NULL) {
         painter_head = work_to_add;
     } else {
-        tail->next_work = work_to_add;
+        tail->next_job = work_to_add;
     }
 
     pthread_mutex_unlock(&painter_mutex);
@@ -221,7 +221,7 @@ job_t *get_screwdriver_job() {
     pthread_mutex_lock(&screwdriver_mutex);
 
     job_t *result = screwdriver_head;
-    screwdriver_head = screwdriver_head->next_work;
+    screwdriver_head = screwdriver_head->next_job;
 
     pthread_mutex_unlock(&screwdriver_mutex);
     return result;
@@ -234,7 +234,7 @@ void add_srewdriver_job(job_t *work_to_add) {
     if (tail == NULL) {
         screwdriver_head = work_to_add;
     } else {
-        tail->next_work = work_to_add;
+        tail->next_job = work_to_add;
     }
 
     pthread_mutex_unlock(&screwdriver_mutex);
@@ -249,7 +249,7 @@ job_t *get_milling_job() {
     pthread_mutex_lock(&milling_cutter_mutex);
 
     job_t *result = milling_cutter_head;
-    milling_cutter_head = milling_cutter_head->next_work;
+    milling_cutter_head = milling_cutter_head->next_job;
 
     pthread_mutex_unlock(&milling_cutter_mutex);
     return result;
@@ -262,7 +262,7 @@ void add_milling_job(job_t *work_to_add) {
     if (tail == NULL) {
         milling_cutter_head = work_to_add;
     } else {
-        tail->next_work = work_to_add;
+        tail->next_job = work_to_add;
     }
 
     pthread_mutex_unlock(&milling_cutter_mutex);
