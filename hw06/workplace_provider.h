@@ -13,7 +13,10 @@ void add_workplace(workplace_type type);
 
 workplace_t *get_workplace(workplace_type type);
 
+char *get_workplace_name(workplace_type type);
+
 workplace_type parse_workplace_type(char *type);
+
 
 void free_workplaces();
 

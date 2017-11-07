@@ -6,6 +6,20 @@
 #include "buffers.h"
 #include "workplace_chain.h"
 
+char get_job_type_name(job_type type) {
+    switch (type) {
+
+        case A:
+            return 'A';
+        case B:
+            return 'B';
+        case C:
+            return 'C';
+        default:
+            return ' ';
+    }
+}
+
 job_type get_job_type(char type) {
     switch (type) {
         case 'A':
@@ -28,7 +42,7 @@ job_t *create_job(char char_type) {
     job->next_job = NULL;
     job->step = 0;
 
-    workplace_type place = get_next_work_place(job);
+    workplace_type place = get_next_workplace_type(job);
     int sleep_time = get_sleep_time(place);
 
     job->sleep_time = sleep_time;

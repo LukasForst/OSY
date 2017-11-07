@@ -5,11 +5,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
-
-#include "commands.h"
-#include "workplace_chain.h"
-#include "workplace_provider.h"
+#include "global.h"
 #include "job_provider.h"
+#include "worker_provider.h"
+#include "workplace_provider.h"
 
 _Bool command_make() {
     char char_type;
@@ -24,13 +23,33 @@ _Bool command_make() {
 
 
 _Bool command_start() {
+    char *worker_name, *workplace_name;
+    if (scanf("%ms", &worker_name) != 1) {
+        //todo error handling
+        return false;
+    }
 
+    if (scanf("%ms", &workplace_name) != 1) {
+        //todo error handling
+        return false;
+    }
+    workplace_t * workplace = NULL;
+    create_worker(worker_name, workplace);
 
+    free(worker_name);
+    free(workplace_name);
     return true;
+
 }
 
 _Bool command_end() {
-
+    char *worker_name;
+    if (scanf("%ms", &worker_name) != 1) {
+        //todo error handling
+        return false;
+    }
+    remove_worker(worker_name);
+    free(worker_name);
     return true;
 }
 

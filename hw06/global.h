@@ -28,12 +28,11 @@ typedef struct workplace {
 
 
 typedef struct {
-    int worker_number; //id of worker
     _Bool is_active; //determines whether is worker working right now
     char *name; //name of worker
 
     workplace_t *workplace; //workplace where is this particular worker
-} worker_t;
+} worker_info_t;
 
 typedef struct job {
     int sleep_time;

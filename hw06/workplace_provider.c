@@ -9,6 +9,27 @@
 
 workplace_t *head;
 
+char *get_workplace_name(workplace_type type){
+    switch (type){
+        case SCISSORS:
+            return "nuzky";
+        case DRILL:
+            return "vrtacka";
+        case BENDING_MACHINE:
+            return "ohybacka";
+        case WELDER:
+            return "svarecka";
+        case PAINTER:
+            return "lakovna";
+        case SCREWDRIVER:
+            return "sroubovak";
+        case MILLING_CUTTER:
+            return "freza";
+        default:
+            return "unsupported type";
+    }
+}
+
 workplace_t *get_workplace(workplace_type type) {
     workplace_t *cursor = head;
     workplace_t *possible_workplace = NULL;

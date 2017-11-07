@@ -6,6 +6,7 @@
 #include "buffers.h"
 #include "commands.h"
 #include "workplace_provider.h"
+
 int main() {
     buffers_init();
 

@@ -32,7 +32,7 @@ workplace_type get_next(workplace_type current_workplace, workplace_type *chain,
 }
 
 
-workplace_type get_next_work_place(job_t *job) {
+workplace_type get_next_workplace_type(job_t *job) {
     switch (job->type) {
         case A:
             return get_next(job->current_workplace, A_chain, sizeof(A_chain));
