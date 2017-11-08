@@ -12,6 +12,8 @@ pthread_t create_worker(char *name, workplace_t *workplace);
 
 void remove_worker(char *name);
 
+void wake_up_workers(workplace_type type);
+
 void free_workers();
 
 #endif //HW06_WORKER_PROVIDER_H

@@ -6,6 +6,7 @@
 #include "buffers.h"
 #include "commands.h"
 #include "workplace_provider.h"
+#include "worker_provider.h"
 
 int main() {
     buffers_init();
@@ -44,6 +45,7 @@ int main() {
     }
 
     //todo free data and wait for consumers
+    free_workers();
     free_buffers();
     free_workplaces();
     return 0;

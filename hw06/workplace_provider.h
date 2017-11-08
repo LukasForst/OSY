@@ -17,7 +17,6 @@ char *get_workplace_name(workplace_type type);
 
 workplace_type parse_workplace_type(char *type);
 
-void wake_up_workplaces(workplace_type type);
 void free_workplaces();
 
 #endif //HW06_WORKPLACE_PROVIDER_H

@@ -6,7 +6,7 @@
 #define HW06_GLOBAL_H
 
 #include <pthread.h>
-#include <bits/semaphore.h>
+#include <semaphore.h>
 
 typedef enum {
     NOT_STARTED, SCISSORS, DRILL, BENDING_MACHINE, WELDER, PAINTER, SCREWDRIVER, MILLING_CUTTER, FINISHED
@@ -19,7 +19,6 @@ typedef enum {
 
 typedef struct workplace {
     _Bool is_working; //determines whether is mutex locked and whether is this workspace active or not
-    _Bool is_active; //when set to false, workplace will be disposed
 
     workplace_type type;
     pthread_mutex_t mutex;
@@ -30,16 +29,18 @@ typedef struct workplace {
 
 
 typedef struct {
-    _Bool is_active; //determines whether is worker working right now
     char *name; //name of worker
-
+    volatile _Bool is_working; //determines whether is worker working right now
+    volatile _Bool is_active; //determines whether is worker going to be disposed or not
     workplace_t *workplace; //workplace where is this particular worker
+    sem_t wakeup; //wakes up worker
 } worker_info_t;
 
 typedef struct job {
     int sleep_time;
     int step;
     job_type type;
+    workplace_type previous_workplace;
     workplace_type current_workplace;
 
     struct job *next_job; // for linked list

@@ -33,7 +33,7 @@ _Bool command_start() {
         //todo error handling
         return false;
     }
-    workplace_t * workplace = NULL;
+    workplace_t * workplace = get_workplace(parse_workplace_type(workplace_name));
     create_worker(worker_name, workplace);
 
     free(worker_name);

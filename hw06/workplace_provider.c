@@ -6,23 +6,13 @@
 #include <stdbool.h>
 #include <memory.h>
 #include <semaphore.h>
+#include <stdio.h>
 #include "workplace_provider.h"
 
-workplace_t *head;
+workplace_t *workplaces_head = NULL;
 
-void wake_up_workplaces(workplace_type type){
-    workplace_t *cursor = head;
-
-    while (cursor != NULL) {
-        if (cursor->type == type) {
-            sem_post(&cursor->added);
-        }
-        cursor = cursor->next_workplace;
-    }
-}
-
-char *get_workplace_name(workplace_type type){
-    switch (type){
+char *get_workplace_name(workplace_type type) {
+    switch (type) {
         case SCISSORS:
             return "nuzky";
         case DRILL:
@@ -43,7 +33,7 @@ char *get_workplace_name(workplace_type type){
 }
 
 workplace_t *get_workplace(workplace_type type) {
-    workplace_t *cursor = head;
+    workplace_t *cursor = workplaces_head;
     workplace_t *possible_workplace = NULL;
 
     while (cursor != NULL) {
@@ -90,15 +80,17 @@ workplace_type parse_workplace_type(char *type) {
 }
 
 void delete_workplace(workplace_type type) {
-    workplace_t *cursor = head;
+    fprintf(stderr, "Workplace \"%s\" will be removed.\n", get_workplace_name(type));
+
+    workplace_t *cursor = workplaces_head;
     workplace_t *previous = cursor;
 
     while (cursor != NULL) {
         if (cursor->type == type && !cursor->is_working) {
             pthread_mutex_lock(&cursor->mutex);
 
-            if (cursor == head) {
-                head = cursor->next_workplace;
+            if (cursor == workplaces_head) {
+                workplaces_head = cursor->next_workplace;
             } else {
                 previous->next_workplace = cursor->next_workplace;
             }
@@ -108,6 +100,9 @@ void delete_workplace(workplace_type type) {
             pthread_mutex_unlock(&cursor->mutex);
             pthread_mutex_destroy(&cursor->mutex);
             free(cursor);
+
+            fprintf(stderr, "Workplace \"%s\" was disposed. This workplace was not working\n",
+                    get_workplace_name(type));
             return;
         }
 
@@ -115,7 +110,7 @@ void delete_workplace(workplace_type type) {
         cursor = cursor->next_workplace;
     }
 
-    cursor = head;
+    cursor = workplaces_head;
     previous = cursor;
     while (cursor != NULL) {
         if (cursor->type == type) {
@@ -128,27 +123,32 @@ void delete_workplace(workplace_type type) {
             pthread_mutex_unlock(&cursor->mutex);
             pthread_mutex_destroy(&cursor->mutex);
             free(cursor);
+
+            fprintf(stderr, "Workplace \"%s\" was disposed. This workplace was working\n", get_workplace_name(type));
             return;
         }
 
         cursor = cursor->next_workplace;
     }
+
+    fprintf(stderr, "Workplace \"%s\" was not found!.\n", get_workplace_name(type));
 }
 
 void add_workplace(workplace_type type) {
+    fprintf(stderr, "Adding new workplace \"%s\".\n", get_workplace_name(type));
+
     workplace_t *new_workplace = (workplace_t *) malloc(sizeof(workplace_t));
     new_workplace->type = type;
     new_workplace->is_working = false;
-    new_workplace->is_active = true;
     new_workplace->next_workplace = NULL;
     sem_init(&(new_workplace->added), 1, 0);
 
     pthread_mutex_init(&(new_workplace->mutex), NULL);
 
-    if (head == NULL) {
-        head = new_workplace;
+    if (workplaces_head == NULL) {
+        workplaces_head = new_workplace;
     } else {
-        workplace_t *tail = head;
+        workplace_t *tail = workplaces_head;
         while (tail != NULL) {
             if (tail->next_workplace != NULL) {
                 tail = tail->next_workplace;
@@ -158,10 +158,12 @@ void add_workplace(workplace_type type) {
             }
         }
     }
+
+    fprintf(stderr, "workplace \"%s\" added.\n", get_workplace_name(type));
 }
 
 void free_workplaces() {
-    workplace_t *cursor = head;
+    workplace_t *cursor = workplaces_head;
 
     while (cursor != NULL) {
         workplace_t *current = cursor;

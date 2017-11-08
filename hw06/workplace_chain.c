@@ -12,19 +12,21 @@ C: 1:freza   - 2:vrtacka - 3:sroubovak - 4:vrtacka  - 5:freza   - 6:lakovna
 
 */
 
-workplace_type A_chain[6] = {SCISSORS, DRILL, BENDING_MACHINE, WELDER, DRILL, PAINTER};
-workplace_type B_chain[6] = {DRILL, SCISSORS, MILLING_CUTTER, DRILL, PAINTER, SCREWDRIVER};
-workplace_type C_chain[6] = {MILLING_CUTTER, DRILL, SCREWDRIVER, DRILL, MILLING_CUTTER, PAINTER};
+workplace_type A_chain[8] = {NOT_STARTED, SCISSORS, DRILL, BENDING_MACHINE, WELDER, DRILL, PAINTER, FINISHED};
+workplace_type B_chain[8] = {NOT_STARTED, DRILL, SCISSORS, MILLING_CUTTER, DRILL, PAINTER, SCREWDRIVER, FINISHED};
+workplace_type C_chain[8] = {NOT_STARTED, MILLING_CUTTER, DRILL, SCREWDRIVER, DRILL, MILLING_CUTTER, PAINTER, FINISHED};
 
 
-workplace_type get_next(workplace_type current_workplace, workplace_type *chain, int chain_size) {
-    if(current_workplace == NOT_STARTED){
-        return chain[0];
+workplace_type
+get_next(workplace_type previous_workplace, workplace_type current_workplace, workplace_type *chain, int chain_size) {
+    if (current_workplace == NOT_STARTED) {
+        return chain[1];
     }
 
-    for (int i = 0; i < chain_size; i++) {
-        if (current_workplace == chain[i]) {
-            return ++i >= chain_size ? FINISHED : chain[i];
+    for (int i = 1; i < chain_size; i++) {
+        if (current_workplace == chain[i] && previous_workplace == chain[i - 1]) {
+            workplace_type result = ++i >= chain_size ? FINISHED : chain[i];
+            return result;
         }
     }
 
@@ -35,11 +37,11 @@ workplace_type get_next(workplace_type current_workplace, workplace_type *chain,
 workplace_type get_next_workplace_type(job_t *job) {
     switch (job->type) {
         case A:
-            return get_next(job->current_workplace, A_chain, sizeof(A_chain));
+            return get_next(job->previous_workplace, job->current_workplace, A_chain, 8);
         case B:
-            return get_next(job->current_workplace, B_chain, sizeof(B_chain));
+            return get_next(job->previous_workplace, job->current_workplace, B_chain, 8);
         case C:
-            return get_next(job->current_workplace, C_chain, sizeof(C_chain));
+            return get_next(job->previous_workplace, job->current_workplace, C_chain, 8);
         default:
             return FINISHED;
     }
@@ -56,8 +58,8 @@ sroubovak: 250
 freza: 500
 */
 
-int get_sleep_time(workplace_type current_workplace){
-    switch (current_workplace){
+int get_sleep_time(workplace_type current_workplace) {
+    switch (current_workplace) {
         case SCISSORS:
             return 100;
         case DRILL:

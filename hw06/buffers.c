@@ -7,34 +7,34 @@
 
 #include "buffers.h"
 
-job_t *scissors_head;
+job_t *scissors_head = NULL;
 pthread_mutex_t scissors_mutex;
 
-job_t *drill_head;
+job_t *drill_head = NULL;
 pthread_mutex_t drill_mutex;
 
-job_t *bending_machine_head;
+job_t *bending_machine_head = NULL;
 pthread_mutex_t bending_machine_mutex;
 
-job_t *welder_head;
+job_t *welder_head = NULL;
 pthread_mutex_t welder_mutex;
 
-job_t *painter_head;
+job_t *painter_head = NULL;
 pthread_mutex_t painter_mutex;
 
-job_t *screwdriver_head;
+job_t *screwdriver_head = NULL;
 pthread_mutex_t screwdriver_mutex;
 
-job_t *milling_cutter_head;
+job_t *milling_cutter_head = NULL;
 pthread_mutex_t milling_cutter_mutex;
 
 
 job_t *get_tail(job_t *head) {
-    job_t * cursor = head;
-    while(cursor != NULL){
-        if(cursor->next_job != NULL){
+    job_t *cursor = head;
+    while (cursor != NULL) {
+        if (cursor->next_job != NULL) {
             cursor = cursor->next_job;
-        } else{
+        } else {
             break;
         }
     }
