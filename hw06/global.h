@@ -19,10 +19,8 @@ typedef enum {
 
 typedef struct workplace {
     _Bool is_working; //determines whether is mutex locked and whether is this workspace active or not
-
     workplace_type type;
     pthread_mutex_t mutex;
-    sem_t added; //signal, that job has been added
 
     struct workplace *next_workplace; // for linked list
 } workplace_t;

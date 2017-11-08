@@ -22,7 +22,7 @@ char get_job_type_name(job_type type) {
     }
 
     fprintf(stderr, "Wrong job_type! \'%d\' is nod valid job type.\n", type);
-    return (job_type) 0; //not defined
+    return 'N'; //not defined
 }
 
 job_type get_job_type(char type) {
@@ -49,7 +49,7 @@ job_t *create_job(char char_type) {
     job->step = 1;
 
     workplace_type place = get_next_workplace_type(job);
-    int sleep_time = get_sleep_time(place);
+    __useconds_t sleep_time = get_sleep_time(place);
 
     job->sleep_time = sleep_time;
     job->current_workplace = place;

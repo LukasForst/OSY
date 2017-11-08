@@ -13,7 +13,7 @@
 _Bool command_make() {
     char char_type;
     if (scanf(" %c", &char_type) != 1) {
-        //todo error handling
+        fprintf(stderr, "Reading error!\n");
         return false;
     }
     job_t *job = create_job(char_type);
@@ -25,16 +25,29 @@ _Bool command_make() {
 _Bool command_start() {
     char *worker_name, *workplace_name;
     if (scanf("%ms", &worker_name) != 1) {
-        //todo error handling
+        fprintf(stderr, "Reading error!\n");
+        if (worker_name != NULL) {
+            free(worker_name);
+        }
         return false;
     }
 
     if (scanf("%ms", &workplace_name) != 1) {
-        //todo error handling
+        fprintf(stderr, "Reading error!\n");
+        if (workplace_name != NULL) {
+            free(workplace_name);
+        }
         return false;
     }
-    workplace_t * workplace = get_workplace(parse_workplace_type(workplace_name));
-    create_worker(worker_name, workplace);
+    workplace_type type = parse_workplace_type(workplace_name);
+
+    if ((int) type != -1) {
+        workplace_t *workplace = get_workplace(type);
+
+        if(workplace != NULL){
+            create_worker(worker_name, workplace);
+        }
+    }
 
     free(worker_name);
     free(workplace_name);
@@ -45,7 +58,10 @@ _Bool command_start() {
 _Bool command_end() {
     char *worker_name;
     if (scanf("%ms", &worker_name) != 1) {
-        //todo error handling
+        fprintf(stderr, "Reading error!\n");
+        if (worker_name != NULL) {
+            free(worker_name);
+        }
         return false;
     }
     remove_worker(worker_name);
@@ -56,11 +72,19 @@ _Bool command_end() {
 _Bool command_add() {
     char *workplace_name;
     if (scanf("%ms", &workplace_name) != 1) {
-        //todo error handling
+        fprintf(stderr, "Reading error!\n");
+        if (workplace_name != NULL) {
+            free(workplace_name);
+        }
         return false;
     }
+
     workplace_type type = parse_workplace_type(workplace_name);
-    add_workplace(type);
+
+    if ((int) type != -1) {
+        add_workplace(type);
+    }
+
     free(workplace_name);
     return true;
 }
@@ -68,11 +92,19 @@ _Bool command_add() {
 _Bool command_remove() {
     char *workplace_name;
     if (scanf("%ms", &workplace_name) != 1) {
-        //todo error handling
+        fprintf(stderr, "Reading error!\n");
+        if (workplace_name != NULL) {
+            free(workplace_name);
+        }
         return false;
     }
+
     workplace_type type = parse_workplace_type(workplace_name);
-    delete_workplace(type);
+
+    if ((int) type != -1) {
+        delete_workplace(type);
+    }
+
     free(workplace_name);
     return true;
 }

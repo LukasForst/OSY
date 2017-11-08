@@ -44,7 +44,6 @@ int main() {
         break;
     }
 
-    //todo free data and wait for consumers
     free_workers();
     free_buffers();
     free_workplaces();
