@@ -1,10 +1,10 @@
-EXTRA_CFLAGS ?=-fsanitize=address -fno-omit-frame-pointer
+#EXTRA_CFLAGS ?=-fsanitize=address -fno-omit-frame-pointer
 FILES=main.o buffers.o job_provider.o workplace_chain.o commands.o workplace_provider.o worker_provider.o worker.o
 CC=gcc
 CFLAGS=-pthread -g -Wall -Iinclude
 
 factory: $(FILES)
-	$(CC) $(CFLAGS) -o $@ $(FILES)
+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -o $@ $(FILES)
 
 run: factory
 	./factory
@@ -12,10 +12,10 @@ run: factory
 %.o: %.c
 	$(CC) -o $@ -c $(CFLAGS) $(EXTRA_CFLAGS) $<
 
-clean:
+clean: factory
 	rm $(FILES)
 	rm factory
-	rm hw06_osy.tgz
 
-zip:
+zip: factory
+	make clean
 	zip hw06_osy.zip Makefile *.[ch]

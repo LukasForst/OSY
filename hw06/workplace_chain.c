@@ -58,7 +58,7 @@ sroubovak: 250
 freza: 500
 */
 
-int get_sleep_time(workplace_type current_workplace) {
+__useconds_t get_sleep_time(workplace_type current_workplace) {
     switch (current_workplace) {
         case SCISSORS:
             return 100;

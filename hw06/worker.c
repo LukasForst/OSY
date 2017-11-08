@@ -37,7 +37,7 @@ void *worker(void *arg) {
 
         printf("%s %s %c %d\n", worker_info->name, get_workplace_name(workplace->type), get_job_type_name(job->type),
                job->step);
-        usleep((__useconds_t) job->sleep_time);
+        usleep(job->sleep_time);
 
         workplace_type next_workplace_type = get_next_workplace_type(job);
         if (next_workplace_type == FINISHED) {
@@ -51,6 +51,8 @@ void *worker(void *arg) {
             add_job(job);
         }
 
+        worker_info->is_working = false;
+        worker_info->workplace->is_working = false;
         pthread_mutex_unlock(&workplace->mutex);
     }
     return NULL;

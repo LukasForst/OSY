@@ -37,7 +37,7 @@ typedef struct {
 } worker_info_t;
 
 typedef struct job {
-    int sleep_time;
+    __useconds_t sleep_time;
     int step;
     job_type type;
     workplace_type previous_workplace;
