@@ -51,6 +51,8 @@ _Bool command_start() {
 
     free(worker_name);
     free(workplace_name);
+
+    sem_wait(&producer_wake);
     return true;
 
 }

@@ -8,6 +8,8 @@
 #include <pthread.h>
 #include <semaphore.h>
 
+sem_t producer_wake;
+
 typedef enum {
     NOT_STARTED, SCISSORS, DRILL, BENDING_MACHINE, WELDER, PAINTER, SCREWDRIVER, MILLING_CUTTER, FINISHED
 } workplace_type;

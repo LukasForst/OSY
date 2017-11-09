@@ -18,6 +18,7 @@ void *worker(void *arg) {
     worker_info_t *worker_info = (worker_info_t *) arg;
     workplace_t *workplace = worker_info->workplace;
     fprintf(stderr, "Worker \"%s\" started!\n", worker_info->name);
+    sem_post(&producer_wake);
     while (worker_info->is_active) {
         job_t *job = get_job(workplace->type);
 

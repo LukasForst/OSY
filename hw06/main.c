@@ -10,6 +10,7 @@
 
 int main() {
     buffers_init();
+    sem_init(&producer_wake, 1, 0);
 
     int scan_result;
     char *word;

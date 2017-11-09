@@ -61,19 +61,19 @@ freza: 500
 __useconds_t get_sleep_time(workplace_type current_workplace) {
     switch (current_workplace) {
         case SCISSORS:
-            return 100;
+            return 100000;
         case DRILL:
-            return 200;
+            return 200000;
         case BENDING_MACHINE:
-            return 150;
+            return 150000;
         case WELDER:
-            return 300;
+            return 300000;
         case PAINTER:
-            return 400;
+            return 400000;
         case SCREWDRIVER:
-            return 250;
+            return 250000;
         case MILLING_CUTTER:
-            return 500;
+            return 500000;
         default:
             return 0;
     }
