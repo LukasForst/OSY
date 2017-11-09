@@ -9,6 +9,8 @@
 
 void buffers_init();
 
+_Bool contains_job_in_stage(workplace_type workplace_type);
+
 job_t * get_scissors_job();
 void add_scissors_job(job_t* work_to_add);
 

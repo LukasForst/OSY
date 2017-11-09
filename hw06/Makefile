@@ -1,4 +1,4 @@
-EXTRA_CFLAGS ?=-fsanitize=address -fno-omit-frame-pointer
+#EXTRA_CFLAGS ?=-fsanitize=address -fno-omit-frame-pointer
 FILES=main.o buffers.o job_provider.o workplace_chain.o commands.o workplace_provider.o worker_provider.o worker.o
 CC=gcc
 CFLAGS=-pthread -Wall -g -O2

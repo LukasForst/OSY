@@ -8,7 +8,11 @@
 #include <pthread.h>
 #include "global.h"
 
-pthread_t create_worker(char *name, workplace_t *workplace);
+_Bool is_somebody_working();
+
+_Bool contains_worker(workplace_type type);
+
+pthread_t create_worker(char *name, workplace_type type);
 
 void remove_worker(char *name);
 

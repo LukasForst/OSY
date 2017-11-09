@@ -29,6 +29,27 @@ job_t *milling_cutter_head = NULL;
 pthread_mutex_t milling_cutter_mutex;
 
 
+_Bool contains_job_in_stage(workplace_type workplace_type){
+    switch (workplace_type) {
+        case SCISSORS:
+            return scissors_head != NULL;
+        case DRILL:
+            return drill_head != NULL;
+        case BENDING_MACHINE:
+            return bending_machine_head != NULL;
+        case WELDER:
+            return welder_head != NULL;
+        case PAINTER:
+            return painter_head != NULL;
+        case SCREWDRIVER:
+            return scissors_head != NULL;
+        case MILLING_CUTTER:
+            return milling_cutter_head != NULL;
+        default:
+            return NULL;
+    }
+}
+
 job_t *get_tail(job_t *head) {
     job_t *cursor = head;
     while (cursor != NULL) {

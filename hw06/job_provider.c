@@ -7,6 +7,7 @@
 #include "buffers.h"
 #include "workplace_chain.h"
 #include "worker_provider.h"
+#include "workplace_provider.h"
 
 char get_job_type_name(job_type type) {
     switch (type) {
@@ -58,6 +59,7 @@ job_t *create_job(char char_type) {
 }
 
 void add_job(job_t *job_to_add) {
+    fprintf(stderr, "Adding job to \"%s\".\n", get_workplace_name(job_to_add->current_workplace));
     switch (job_to_add->current_workplace) {
         case SCISSORS:
             add_scissors_job(job_to_add);
@@ -79,7 +81,6 @@ void add_job(job_t *job_to_add) {
             break;
         case MILLING_CUTTER:
             add_milling_job(job_to_add);
-            break;
         default:
             break;
     }

@@ -3,10 +3,42 @@
 #include <memory.h>
 #include <stdlib.h>
 
+#include "global.h"
 #include "buffers.h"
 #include "commands.h"
 #include "workplace_provider.h"
 #include "worker_provider.h"
+
+workplace_type
+        options[7] = {SCISSORS, DRILL, BENDING_MACHINE, WELDER, PAINTER, SCREWDRIVER,
+                                            MILLING_CUTTER};
+
+_Bool can_work() {
+    if(is_somebody_working()){
+        return true;
+    }
+    for (int i = 0; i < 7; i++) {
+        workplace_type type = options[i];
+
+        _Bool job = contains_job_in_stage(type);
+        if (job) {
+            _Bool workplace = contains_workplace(type);
+            _Bool worker = contains_worker(type);
+            if (worker && workplace) {
+                fprintf(stderr, "There is job, worker and workplace for \'%s\'.\n", get_workplace_name(type));
+                return true;
+            } else {
+                fprintf(stderr,"There is no job for \'%s\' - workplace - %d, worker - %d\n", get_workplace_name(type), workplace, worker);
+                return false;
+            }
+        } else{
+            fprintf(stderr, "Buffer does not contain job for \'%s\'.\n", get_workplace_name(type));
+            continue;
+        }
+    }
+
+    return false;
+}
 
 int main() {
     buffers_init();
@@ -43,6 +75,12 @@ int main() {
             continue;
         }
         break;
+    }
+
+    fprintf(stderr, "Received EOF, ending application!\n");
+
+    while (can_work()) {
+        sem_wait(&producer_wake);
     }
 
     free_workers();

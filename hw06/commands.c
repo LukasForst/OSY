@@ -16,6 +16,7 @@ _Bool command_make() {
         fprintf(stderr, "Reading error!\n");
         return false;
     }
+    fprintf(stderr, "Command MAKE for \'%c\'.\n", char_type);
     job_t *job = create_job(char_type);
     add_job(job);
     return true;
@@ -39,14 +40,11 @@ _Bool command_start() {
         }
         return false;
     }
+    fprintf(stderr, "Command START for \"%s\" - \"%s\".\n", worker_name, workplace_name);
     workplace_type type = parse_workplace_type(workplace_name);
 
     if ((int) type != -1) {
-        workplace_t *workplace = get_workplace(type);
-
-        if(workplace != NULL){
-            create_worker(worker_name, workplace);
-        }
+        create_worker(worker_name, type);
     }
 
     free(worker_name);
@@ -66,6 +64,7 @@ _Bool command_end() {
         }
         return false;
     }
+    fprintf(stderr, "Command END for \"%s\".\n", worker_name);
     remove_worker(worker_name);
     free(worker_name);
     return true;
@@ -81,6 +80,7 @@ _Bool command_add() {
         return false;
     }
 
+    fprintf(stderr, "Command ADD for \"%s\".\n", workplace_name);
     workplace_type type = parse_workplace_type(workplace_name);
 
     if ((int) type != -1) {
@@ -100,7 +100,7 @@ _Bool command_remove() {
         }
         return false;
     }
-
+    fprintf(stderr, "Command REMOVE for \"%s\".\n", workplace_name);
     workplace_type type = parse_workplace_type(workplace_name);
 
     if ((int) type != -1) {

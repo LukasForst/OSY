@@ -19,12 +19,36 @@ typedef struct running_worker {
 
 running_worker_t *running_workers_head = NULL;
 
+_Bool is_somebody_working(){
+    running_worker_t * cursor = running_workers_head;
+
+    while(cursor != NULL){
+        if(cursor->worker_info->is_working){
+            return true;
+        }
+        cursor = cursor->next;
+    }
+    return false;
+}
+
+_Bool contains_worker(workplace_type type){
+    running_worker_t * cursor = running_workers_head;
+
+    while(cursor != NULL){
+        if(cursor->worker_info->type == type){
+            return true;
+        }
+        cursor = cursor->next;
+    }
+    return false;
+}
+
 void wake_up_workers(workplace_type type) {
     running_worker_t *cursor = running_workers_head;
     int waked_workers = 0;
 
     while (cursor != NULL) {
-        if (cursor->worker_info->workplace->type == type) {
+        if (cursor->worker_info->type == type) {
             sem_post(&cursor->worker_info->wakeup);
             waked_workers++;
             fprintf(stderr, "Worker \"%s\" has been waked up.\n", cursor->worker_info->name);
@@ -34,13 +58,13 @@ void wake_up_workers(workplace_type type) {
     fprintf(stderr, "Number of waked workers: %d\n", waked_workers);
 }
 
-pthread_t create_worker(char *name, workplace_t *workplace) {
+pthread_t create_worker(char *name, workplace_type type) {
     worker_info_t *worker_info = (worker_info_t *) malloc(sizeof(worker_info_t));
 
     worker_info->name = (char *) malloc((strlen(name) + 3) * sizeof(char));
     strcpy(worker_info->name, name);
 
-    worker_info->workplace = workplace;
+    worker_info->type = type;
     worker_info->is_working = false;
     worker_info->is_active = true;
     sem_init(&(worker_info->wakeup), 1, 0);
@@ -63,7 +87,7 @@ pthread_t create_worker(char *name, workplace_t *workplace) {
         cursor->next = running;
     }
     fprintf(stderr, "Worker with name \"%s\" was created and attached to the workplace \"%s\".\n", name,
-            get_workplace_name(workplace->type));
+            get_workplace_name(type));
     return thread;
 }
 
@@ -98,6 +122,7 @@ void remove_worker(char *name) {
 }
 
 void free_workers() {
+    fprintf(stderr, "Disposing ALL workers!\n");
     running_worker_t *cursor = running_workers_head;
     while (cursor != NULL) {
         running_worker_t *to_be_freed = cursor;
@@ -107,4 +132,5 @@ void free_workers() {
         remove_worker(name);
         free(name);
     }
+    fprintf(stderr, "All workers disposed!\n");
 }

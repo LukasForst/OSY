@@ -10,6 +10,10 @@
 
 workplace_t *workplaces_head = NULL;
 
+_Bool contains_workplace(workplace_type type){
+    return get_workplace(type) != NULL;
+}
+
 char *get_workplace_name(workplace_type type) {
     switch (type) {
         case SCISSORS:

@@ -8,11 +8,16 @@
 #include <pthread.h>
 #include <semaphore.h>
 
+#define WORKPLACES_NO 7
 sem_t producer_wake;
 
 typedef enum {
     NOT_STARTED, SCISSORS, DRILL, BENDING_MACHINE, WELDER, PAINTER, SCREWDRIVER, MILLING_CUTTER, FINISHED
 } workplace_type;
+//
+//workplace_type
+//        possible_workspaces[WORKPLACES_NO] = {SCISSORS, DRILL, BENDING_MACHINE, WELDER, PAINTER, SCREWDRIVER,
+//                                            MILLING_CUTTER};
 
 typedef enum {
     A, B, C
@@ -32,7 +37,7 @@ typedef struct {
     char *name; //name of worker
     volatile _Bool is_working; //determines whether is worker working right now
     volatile _Bool is_active; //determines whether is worker going to be disposed or not
-    workplace_t *workplace; //workplace where is this particular worker
+    workplace_type type; //workplace type for this worker
     sem_t wakeup; //wakes up worker
 } worker_info_t;
 

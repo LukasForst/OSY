@@ -16,25 +16,26 @@
 
 void *worker(void *arg) {
     worker_info_t *worker_info = (worker_info_t *) arg;
-    workplace_t *workplace = worker_info->workplace;
     fprintf(stderr, "Worker \"%s\" started!\n", worker_info->name);
     sem_post(&producer_wake);
-    while (worker_info->is_active) {
-        job_t *job = get_job(workplace->type);
 
+    while (worker_info->is_active) {
+        job_t *job = get_job(worker_info->type);
         if (job == NULL) {
             fprintf(stderr, "Worker \"%s\" is waiting!\n", worker_info->name);
             sem_wait(&worker_info->wakeup);
             fprintf(stderr, "Worker \"%s\" woke up!\n", worker_info->name);
             continue;
         }
+        fprintf(stderr, "Worker \"%s\" is looking for workplace type \"%s\".\n", worker_info->name, get_workplace_name(worker_info->type));
+        workplace_t * workplace = get_workplace(worker_info->type);
 
         fprintf(stderr, "Worker \"%s\" is waiting for workplace \"%s\"!\n", worker_info->name, get_workplace_name(workplace->type));
         pthread_mutex_lock(&workplace->mutex);
         fprintf(stderr, "Worker \"%s\" is going to work!\n", worker_info->name);
 
         worker_info->is_working = true;
-        worker_info->workplace->is_working = true;
+        workplace->is_working = true;
 
         printf("%s %s %c %d\n", worker_info->name, get_workplace_name(workplace->type), get_job_type_name(job->type),
                job->step);
@@ -53,8 +54,9 @@ void *worker(void *arg) {
         }
 
         worker_info->is_working = false;
-        worker_info->workplace->is_working = false;
+        workplace->is_working = false;
         pthread_mutex_unlock(&workplace->mutex);
+        sem_post(&producer_wake);
     }
     return NULL;
 }

@@ -7,6 +7,8 @@
 #ifndef HW06_WORKPLACE_PROVIDER_H
 #define HW06_WORKPLACE_PROVIDER_H
 
+_Bool contains_workplace(workplace_type type);
+
 void delete_workplace(workplace_type type);
 
 void add_workplace(workplace_type type);
