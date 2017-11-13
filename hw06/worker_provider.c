@@ -19,11 +19,11 @@ typedef struct running_worker {
 
 running_worker_t *running_workers_head = NULL;
 
-_Bool is_somebody_working(){
-    running_worker_t * cursor = running_workers_head;
+_Bool is_somebody_working() {
+    running_worker_t *cursor = running_workers_head;
 
-    while(cursor != NULL){
-        if(cursor->worker_info->is_working){
+    while (cursor != NULL) {
+        if (cursor->worker_info->is_working) {
             return true;
         }
         cursor = cursor->next;
@@ -31,11 +31,11 @@ _Bool is_somebody_working(){
     return false;
 }
 
-_Bool contains_worker(workplace_type type){
-    running_worker_t * cursor = running_workers_head;
+_Bool contains_worker(workplace_type type) {
+    running_worker_t *cursor = running_workers_head;
 
-    while(cursor != NULL){
-        if(cursor->worker_info->type == type){
+    while (cursor != NULL) {
+        if (cursor->worker_info->type == type) {
             return true;
         }
         cursor = cursor->next;
@@ -70,7 +70,10 @@ pthread_t create_worker(char *name, workplace_type type) {
     sem_init(&(worker_info->wakeup), 1, 0);
 
     pthread_t thread;
-    pthread_create(&thread, NULL, worker, (void *) worker_info);
+    int err = pthread_create(&thread, NULL, worker, (void *) worker_info);
+    if (err != 0) {
+        fprintf(stderr, "%s\n", strerror(err));
+    }
 
     running_worker_t *running = (running_worker_t *) malloc(sizeof(running_worker_t));
     running->next = NULL;

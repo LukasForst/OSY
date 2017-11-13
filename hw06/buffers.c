@@ -29,7 +29,7 @@ job_t *milling_cutter_head = NULL;
 pthread_mutex_t milling_cutter_mutex;
 
 
-_Bool contains_job_in_stage(workplace_type workplace_type){
+_Bool contains_job_in_stage(workplace_type workplace_type) {
     switch (workplace_type) {
         case SCISSORS:
             return scissors_head != NULL;
@@ -98,18 +98,45 @@ void buffers_init() {
     pthread_mutex_init(&milling_cutter_mutex, NULL);
 }
 
-job_t *get_scissors_job() {
-    if (scissors_head == NULL) {
+job_t *get_generic_job(job_t **head, pthread_mutex_t *mutex) {
+    if (*head == NULL) {
         return NULL;
     }
 
-    pthread_mutex_lock(&scissors_mutex);
+    pthread_mutex_lock(mutex);
 
-    job_t *result = scissors_head;
-    scissors_head = scissors_head->next_job;
+    job_t *cursor = *head;
+    job_t *previous = *head;
+    job_t *result = *head;
 
-    pthread_mutex_unlock(&scissors_mutex);
+    while (cursor->next_job != NULL) {
+        if (result->step > cursor->next_job->step) {
+            result = cursor->next_job;
+            previous = cursor;
+        } else if (result->step == cursor->next_job->step) {
+            if (result->type > cursor->next_job->type) {
+                result = cursor->next_job;
+                previous = cursor;
+            }
+
+        }
+        cursor = cursor->next_job;
+    }
+
+    if (result == *head) {
+        (*head) = NULL;
+    } else if (previous == *head) {
+        (*head)->next_job = result->next_job;
+    } else {
+        previous->next_job = result->next_job;
+    }
+
+    pthread_mutex_unlock(mutex);
     return result;
+}
+
+job_t *get_scissors_job() {
+    return get_generic_job(&scissors_head, &scissors_mutex);
 }
 
 void add_scissors_job(job_t *work_to_add) {
@@ -126,17 +153,7 @@ void add_scissors_job(job_t *work_to_add) {
 }
 
 job_t *get_drill_job() {
-    if (drill_head == NULL) {
-        return NULL;
-    }
-
-    pthread_mutex_lock(&drill_mutex);
-
-    job_t *result = drill_head;
-    drill_head = drill_head->next_job;
-
-    pthread_mutex_unlock(&drill_mutex);
-    return result;
+    return get_generic_job(&drill_head, &drill_mutex);
 }
 
 void add_drill_job(job_t *work_to_add) {
@@ -153,17 +170,7 @@ void add_drill_job(job_t *work_to_add) {
 }
 
 job_t *get_bending_machine_job() {
-    if (bending_machine_head == NULL) {
-        return NULL;
-    }
-
-    pthread_mutex_lock(&bending_machine_mutex);
-
-    job_t *result = bending_machine_head;
-    bending_machine_head = bending_machine_head->next_job;
-
-    pthread_mutex_unlock(&bending_machine_mutex);
-    return result;
+    return get_generic_job(&bending_machine_head, &bending_machine_mutex);
 }
 
 void add_bending_machine_job(job_t *work_to_add) {
@@ -181,17 +188,7 @@ void add_bending_machine_job(job_t *work_to_add) {
 }
 
 job_t *get_welder_job() {
-    if (welder_head == NULL) {
-        return NULL;
-    }
-
-    pthread_mutex_lock(&welder_mutex);
-
-    job_t *result = welder_head;
-    welder_head = welder_head->next_job;
-
-    pthread_mutex_unlock(&welder_mutex);
-    return result;
+    return get_generic_job(&welder_head, &welder_mutex);
 }
 
 void add_welder_job(job_t *work_to_add) {
@@ -208,17 +205,7 @@ void add_welder_job(job_t *work_to_add) {
 }
 
 job_t *get_painter_job() {
-    if (painter_head == NULL) {
-        return NULL;
-    }
-
-    pthread_mutex_lock(&painter_mutex);
-
-    job_t *result = painter_head;
-    painter_head = painter_head->next_job;
-
-    pthread_mutex_unlock(&painter_mutex);
-    return result;
+    return get_generic_job(&painter_head, &painter_mutex);
 }
 
 void add_painter_job(job_t *work_to_add) {
@@ -236,17 +223,7 @@ void add_painter_job(job_t *work_to_add) {
 }
 
 job_t *get_screwdriver_job() {
-    if (screwdriver_head == NULL) {
-        return NULL;
-    }
-
-    pthread_mutex_lock(&screwdriver_mutex);
-
-    job_t *result = screwdriver_head;
-    screwdriver_head = screwdriver_head->next_job;
-
-    pthread_mutex_unlock(&screwdriver_mutex);
-    return result;
+    return get_generic_job(&screwdriver_head, &scissors_mutex);
 }
 
 void add_screwdriver_job(job_t *work_to_add) {
@@ -264,17 +241,7 @@ void add_screwdriver_job(job_t *work_to_add) {
 }
 
 job_t *get_milling_job() {
-    if (milling_cutter_head == NULL) {
-        return NULL;
-    }
-
-    pthread_mutex_lock(&milling_cutter_mutex);
-
-    job_t *result = milling_cutter_head;
-    milling_cutter_head = milling_cutter_head->next_job;
-
-    pthread_mutex_unlock(&milling_cutter_mutex);
-    return result;
+    return get_generic_job(&milling_cutter_head, &milling_cutter_mutex);
 }
 
 void add_milling_job(job_t *work_to_add) {
