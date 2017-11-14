@@ -111,7 +111,7 @@ job_t *get_generic_job(job_t **head, pthread_mutex_t *mutex) {
     job_t *result = *head;
 
     while (cursor->next_job != NULL) {
-        if (result->step > cursor->next_job->step) {
+        if (result->step < cursor->next_job->step) {
             result = cursor->next_job;
             previous = cursor;
         } else if (result->step == cursor->next_job->step) {
@@ -132,6 +132,7 @@ job_t *get_generic_job(job_t **head, pthread_mutex_t *mutex) {
         previous->next_job = result->next_job;
     }
 
+    result->next_job = NULL;
     pthread_mutex_unlock(mutex);
     return result;
 }

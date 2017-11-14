@@ -51,4 +51,5 @@ typedef struct job {
     struct job *next_job; // for linked list
 } job_t;
 
+
 #endif //HW06_GLOBAL_H

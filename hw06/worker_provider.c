@@ -51,7 +51,6 @@ void wake_up_workers(workplace_type type) {
         if (cursor->worker_info->type == type) {
             sem_post(&cursor->worker_info->wakeup);
             waked_workers++;
-            fprintf(stderr, "Worker \"%s\" has been waked up.\n", cursor->worker_info->name);
         }
         cursor = cursor->next;
     }

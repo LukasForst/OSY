@@ -11,10 +11,10 @@
 
 workplace_type
         options[7] = {SCISSORS, DRILL, BENDING_MACHINE, WELDER, PAINTER, SCREWDRIVER,
-                                            MILLING_CUTTER};
+                      MILLING_CUTTER};
 
 _Bool can_work() {
-    if(is_somebody_working()){
+    if (is_somebody_working()) {
         return true;
     }
     for (int i = 0; i < 7; i++) {
@@ -28,15 +28,14 @@ _Bool can_work() {
                 fprintf(stderr, "There is job, worker and workplace for \'%s\'.\n", get_workplace_name(type));
                 return true;
             } else {
-                fprintf(stderr,"There is no job for \'%s\' - workplace - %d, worker - %d\n", get_workplace_name(type), workplace, worker);
-                return false;
+                fprintf(stderr, "There is no job for \'%s\' - workplace - %d, worker - %d\n", get_workplace_name(type),
+                        workplace, worker);
             }
-        } else{
-            fprintf(stderr, "Buffer does not contain job for \'%s\'.\n", get_workplace_name(type));
-            continue;
         }
     }
-
+    if (is_somebody_working()) {
+        return true;
+    }
     return false;
 }
 
