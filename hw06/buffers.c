@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "buffers.h"
 
@@ -42,11 +43,11 @@ _Bool contains_job_in_stage(workplace_type workplace_type) {
         case PAINTER:
             return painter_head != NULL;
         case SCREWDRIVER:
-            return scissors_head != NULL;
+            return screwdriver_head != NULL;
         case MILLING_CUTTER:
             return milling_cutter_head != NULL;
         default:
-            return NULL;
+            return false;
     }
 }
 
@@ -134,6 +135,7 @@ job_t *get_generic_job(job_t **head, pthread_mutex_t *mutex) {
     pthread_mutex_unlock(mutex);
     return result;
 }
+
 
 job_t *get_scissors_job() {
     return get_generic_job(&scissors_head, &scissors_mutex);
@@ -223,7 +225,7 @@ void add_painter_job(job_t *work_to_add) {
 }
 
 job_t *get_screwdriver_job() {
-    return get_generic_job(&screwdriver_head, &scissors_mutex);
+    return get_generic_job(&screwdriver_head, &screwdriver_mutex);
 }
 
 void add_screwdriver_job(job_t *work_to_add) {
