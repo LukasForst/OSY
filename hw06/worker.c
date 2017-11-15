@@ -77,5 +77,6 @@ void *worker(void *arg) {
             fprintf(stderr, "No work, waking up main thread.\n");
         }
     }
+    sem_post(&producer_wake);
     return NULL;
 }
