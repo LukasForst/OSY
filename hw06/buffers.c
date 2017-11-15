@@ -8,25 +8,30 @@
 
 #include "buffers.h"
 
-job_t *scissors_head = NULL;
+typedef struct link_list {
+    job_t *value;
+    struct link_list *next;
+} link_list_t;
+
+link_list_t *scissors_head = NULL;
 pthread_mutex_t scissors_mutex;
 
-job_t *drill_head = NULL;
+link_list_t *drill_head = NULL;
 pthread_mutex_t drill_mutex;
 
-job_t *bending_machine_head = NULL;
+link_list_t *bending_machine_head = NULL;
 pthread_mutex_t bending_machine_mutex;
 
-job_t *welder_head = NULL;
+link_list_t *welder_head = NULL;
 pthread_mutex_t welder_mutex;
 
-job_t *painter_head = NULL;
+link_list_t *painter_head = NULL;
 pthread_mutex_t painter_mutex;
 
-job_t *screwdriver_head = NULL;
+link_list_t *screwdriver_head = NULL;
 pthread_mutex_t screwdriver_mutex;
 
-job_t *milling_cutter_head = NULL;
+link_list_t *milling_cutter_head = NULL;
 pthread_mutex_t milling_cutter_mutex;
 
 
@@ -51,10 +56,11 @@ _Bool contains_job_in_stage(workplace_type workplace_type) {
     }
 }
 
-void free_one_buffer(job_t *head) {
+void free_one_buffer(link_list_t *head) {
     while (head != NULL) {
-        job_t *to_free = head;
-        head = head->next_job;
+        link_list_t *to_free = head;
+        free(to_free->value);
+        head = head->next;
         free(to_free);
     }
 }
@@ -87,64 +93,67 @@ void buffers_init() {
     pthread_mutex_init(&milling_cutter_mutex, NULL);
 }
 
-job_t *get_generic_job(job_t **head, pthread_mutex_t *mutex) {
+job_t *get_generic_job(link_list_t **head, pthread_mutex_t *mutex) {
     if (*head == NULL) {
         return NULL;
     }
 
     pthread_mutex_lock(mutex);
 
-    job_t *cursor = *head;
-    job_t *previous = *head;
-    job_t *result = *head;
+    link_list_t *cursor = *head;
+    link_list_t *previous = *head;
+    link_list_t *result = (*head);
 
-    while (cursor->next_job != NULL) {
-        if (result->step < cursor->next_job->step) {
-            result = cursor->next_job;
+    while (cursor->next != NULL) {
+        if (result->value->step < cursor->next->value->step) {
+            result = cursor->next;
             previous = cursor;
-        } else if (result->step == cursor->next_job->step) {
-            if (result->type > cursor->next_job->type) {
-                result = cursor->next_job;
+        } else if (result->value->step == cursor->next->value->step) {
+            if (result->value->type > cursor->next->value->type) {
+                result = cursor->next;
                 previous = cursor;
             }
 
         }
-        cursor = cursor->next_job;
+        cursor = cursor->next;
     }
 
-    if (result == *head) {
-        if(result->next_job != NULL){
-            (*head) = result->next_job;
-        } else{
-            (*head) = NULL;
-        }
+    if (result == (*head)) {
+        (*head) = (*head)->next;
     } else if (previous == *head) {
-        (*head)->next_job = result->next_job;
+        (*head)->next = result->next;
     } else {
-        previous->next_job = result->next_job;
+        previous->next = result->next;
     }
 
-    result->next_job = NULL;
+    job_t *return_value = result->value;
+    free(result);
     pthread_mutex_unlock(mutex);
-    return result;
+    return return_value;
 }
 
-void add_generic_job(job_t **head, job_t *job_to_add, pthread_mutex_t *mutex) {
+void add_generic_job(link_list_t **head, job_t *job_to_add, pthread_mutex_t *mutex) {
     pthread_mutex_lock(mutex);
 
-    job_to_add->next_job = NULL;
-
     if (*head == NULL) {
-        *head = job_to_add;
+        (*head) = (link_list_t*) malloc(sizeof(link_list_t));
+        (*head)->value = job_to_add;
+        (*head)->next = NULL;
     } else {
-        job_t *cursor = *head;
-        while (cursor->next_job != NULL) {
-            cursor = cursor->next_job;
+        link_list_t *cursor = *head;
+        while (cursor->next != NULL) {
+            cursor = cursor->next;
         }
-        if(cursor == *head){
-            (*head)->next_job = job_to_add;
-        } else{
-            cursor->next_job = job_to_add;
+        if (cursor == *head) {
+            link_list_t * next = (link_list_t*)malloc(sizeof(link_list_t));
+            next->next = NULL;
+            next->value = job_to_add;
+            (*head)->next = next;
+        } else {
+            link_list_t * next = (link_list_t*)malloc(sizeof(link_list_t));
+            next->next = NULL;
+            next->value = job_to_add;
+            cursor->next = next;
         }
     }
 

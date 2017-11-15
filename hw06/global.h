@@ -43,8 +43,6 @@ typedef struct job {
     job_type type;
     workplace_type previous_workplace;
     workplace_type current_workplace;
-
-    struct job *next_job; // for linked list
 } job_t;
 
 _Bool can_work();
