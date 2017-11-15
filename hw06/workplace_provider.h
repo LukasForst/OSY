@@ -11,6 +11,8 @@ _Bool contains_workplace(workplace_type type);
 
 void delete_workplace(workplace_type type);
 
+void delete_workplace_by_id(int id);
+
 void add_workplace(workplace_type type);
 
 workplace_t *get_workplace(workplace_type type);

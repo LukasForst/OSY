@@ -67,6 +67,11 @@ void *worker(void *arg) {
         worker_info->is_working = false;
         workplace->is_working = false;
         pthread_mutex_unlock(&workplace->mutex);
+
+        if(!workplace->is_active){
+            delete_workplace_by_id(workplace->workplace_id);
+        }
+
         sem_post(&producer_wake);
     }
     return NULL;

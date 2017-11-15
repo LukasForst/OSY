@@ -10,7 +10,7 @@
 
 workplace_t *workplaces_head = NULL;
 
-_Bool contains_workplace(workplace_type type){
+_Bool contains_workplace(workplace_type type) {
     return get_workplace(type) != NULL;
 }
 
@@ -82,6 +82,35 @@ workplace_type parse_workplace_type(char *type) {
     return (workplace_type) -1;
 }
 
+void delete_workplace_by_id(int id) {
+    workplace_t *cursor = workplaces_head;
+    workplace_t *previous = cursor;
+
+    while (cursor != NULL) {
+        if (cursor->workplace_id == id) {
+            pthread_mutex_lock(&cursor->mutex);
+
+            if (cursor == workplaces_head) {
+                workplaces_head = cursor->next_workplace;
+            } else {
+                previous->next_workplace = cursor->next_workplace;
+            }
+
+            cursor->next_workplace = NULL;
+
+            pthread_mutex_unlock(&cursor->mutex);
+            pthread_mutex_destroy(&cursor->mutex);
+            free(cursor);
+
+            fprintf(stderr, "Workplace [Id: %d] was disposed. This workplace was not working\n", id);
+            return;
+        }
+
+        previous = cursor;
+        cursor = cursor->next_workplace;
+    }
+}
+
 void delete_workplace(workplace_type type) {
     fprintf(stderr, "Workplace \"%s\" will be removed.\n", get_workplace_name(type));
 
@@ -114,18 +143,10 @@ void delete_workplace(workplace_type type) {
     }
 
     cursor = workplaces_head;
-    previous = cursor;
     while (cursor != NULL) {
         if (cursor->type == type) {
-            pthread_mutex_lock(&cursor->mutex);//this will wait for running job in the workplace
-
-            previous->next_workplace = cursor->next_workplace;
-            cursor->next_workplace = NULL;
-            pthread_mutex_unlock(&cursor->mutex);
-            pthread_mutex_destroy(&cursor->mutex);
-            free(cursor);
-
-            fprintf(stderr, "Workplace \"%s\" was disposed. This workplace was working\n", get_workplace_name(type));
+            cursor->is_active = false;
+            fprintf(stderr, "Workplace \"%s\" [Id: %d] will be disposed. This workplace was working\n", get_workplace_name(type), cursor->workplace_id);
             return;
         }
 
@@ -135,6 +156,8 @@ void delete_workplace(workplace_type type) {
     fprintf(stderr, "Workplace \"%s\" was not found!.\n", get_workplace_name(type));
 }
 
+static int id_counter = 0;
+
 void add_workplace(workplace_type type) {
     fprintf(stderr, "Adding new workplace \"%s\".\n", get_workplace_name(type));
 
@@ -142,7 +165,7 @@ void add_workplace(workplace_type type) {
     new_workplace->type = type;
     new_workplace->is_working = false;
     new_workplace->next_workplace = NULL;
-
+    new_workplace->workplace_id = id_counter++;
     pthread_mutex_init(&(new_workplace->mutex), NULL);
 
     if (workplaces_head == NULL) {
