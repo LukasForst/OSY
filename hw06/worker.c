@@ -68,11 +68,14 @@ void *worker(void *arg) {
         workplace->is_working = false;
         pthread_mutex_unlock(&workplace->mutex);
 
-        if(!workplace->is_active){
+        if (!workplace->is_active) {
             delete_workplace_by_id(workplace->workplace_id);
         }
 
-        sem_post(&producer_wake);
+        if (!can_work()) {
+            sem_post(&producer_wake);
+            fprintf(stderr, "No work, waking up main thread.\n");
+        }
     }
     return NULL;
 }

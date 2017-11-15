@@ -33,9 +33,7 @@ _Bool can_work() {
             }
         }
     }
-    if (is_somebody_working()) {
-        return true;
-    }
+
     return false;
 }
 

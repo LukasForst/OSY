@@ -88,8 +88,8 @@ void add_job(job_t *job_to_add) {
     wake_up_workers(job_to_add->current_workplace);
 }
 
-job_t *get_job(workplace_type name) {
-    switch (name) {
+job_t *get_job(workplace_type workplace) {
+    switch (workplace) {
         case SCISSORS:
             return get_scissors_job();
         case DRILL:

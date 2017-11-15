@@ -8,16 +8,11 @@
 #include <pthread.h>
 #include <semaphore.h>
 
-#define WORKPLACES_NO 7
 sem_t producer_wake;
 
 typedef enum {
     NOT_STARTED, SCISSORS, DRILL, BENDING_MACHINE, WELDER, PAINTER, SCREWDRIVER, MILLING_CUTTER, FINISHED
 } workplace_type;
-//
-//workplace_type
-//        possible_workspaces[WORKPLACES_NO] = {SCISSORS, DRILL, BENDING_MACHINE, WELDER, PAINTER, SCREWDRIVER,
-//                                            MILLING_CUTTER};
 
 typedef enum {
     A, B, C
@@ -52,5 +47,6 @@ typedef struct job {
     struct job *next_job; // for linked list
 } job_t;
 
+_Bool can_work();
 
 #endif //HW06_GLOBAL_H

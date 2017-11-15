@@ -51,18 +51,6 @@ _Bool contains_job_in_stage(workplace_type workplace_type) {
     }
 }
 
-job_t *get_tail(job_t *head) {
-    job_t *cursor = head;
-    while (cursor != NULL) {
-        if (cursor->next_job != NULL) {
-            cursor = cursor->next_job;
-        } else {
-            break;
-        }
-    }
-    return cursor;
-}
-
 void free_one_buffer(job_t *head) {
     while (head != NULL) {
         job_t *to_free = head;
@@ -125,7 +113,11 @@ job_t *get_generic_job(job_t **head, pthread_mutex_t *mutex) {
     }
 
     if (result == *head) {
-        (*head) = NULL;
+        if(result->next_job != NULL){
+            (*head) = result->next_job;
+        } else{
+            (*head) = NULL;
+        }
     } else if (previous == *head) {
         (*head)->next_job = result->next_job;
     } else {
@@ -146,10 +138,14 @@ void add_generic_job(job_t **head, job_t *job_to_add, pthread_mutex_t *mutex) {
         *head = job_to_add;
     } else {
         job_t *cursor = *head;
-        while (cursor->next_job) {
+        while (cursor->next_job != NULL) {
             cursor = cursor->next_job;
         }
-        cursor->next_job = job_to_add;
+        if(cursor == *head){
+            (*head)->next_job = job_to_add;
+        } else{
+            cursor->next_job = job_to_add;
+        }
     }
 
     pthread_mutex_unlock(mutex);
@@ -165,7 +161,8 @@ void add_scissors_job(job_t *job_to_add) {
 }
 
 job_t *get_drill_job() {
-    return get_generic_job(&drill_head, &drill_mutex);
+    job_t *result = get_generic_job(&drill_head, &drill_mutex);
+    return result;
 }
 
 void add_drill_job(job_t *job_to_add) {
