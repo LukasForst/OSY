@@ -1,7 +1,7 @@
 ALL = hello
 
 CC = gcc
-CFLAGS = -m32 -g -nostdlib -nostdinc -fomit-frame-pointer -O2 -Wall -Ilib
+CFLAGS = -m32 -g -nostdlib -fomit-frame-pointer -O2 -Wall -Ilib
 CXXFLAGS = $(CFLAGS) -fno-rtti -fno-exceptions
 ASFLAGS = -m32 -g
 LDFLAGS = -Wl,--build-id=none -Wl,--gc-sections -Wl,-Map=$@.map
