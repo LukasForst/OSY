@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/hw07.dir/main.c.o CMakeFiles/hw07.dir/test.c.o CMakeFiles/hw07.dir/basic.c.o  -o hw07 
